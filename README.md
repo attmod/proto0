@@ -43,6 +43,26 @@ https://github.com/robotology/icub-gazebo-grasping-sandbox into workdir/icub-gaz
 - used for gazebo simulation
 - License: BSD-3
 
+https://github.com/robotology/attention
+- already existing solution for attention 2011-2022
+- no main documentation / tutorial found yet
+- License: GPLv2
+
+https://github.com/robotology/himrep
+
+https://github.com/robotology/logpolar
+
+https://github.com/robotology/point-cloud-read
+
+https://github.com/robotology/segmentation
+
+https://github.com/robotology/stereo-vision
+
+https://github.com/robotology/visual-tracking-control
+
+https://github.com/robotology/visuomotor-learning
+
+
 # License
 
 If not specified otherwise, GPLv2.
