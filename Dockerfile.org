@@ -1,0 +1,80 @@
+FROM ubuntu:20.04
+
+# General container setup
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    apt-utils
+
+RUN apt-get update && apt-get install -y \
+    software-properties-common apt-transport-https sudo \
+    psmisc tmux nano wget curl telnet gnupg gdb git gitk autoconf locales gdebi \
+    terminator meld \
+    python3 python3-dev python3-pip python3-setuptools
+
+RUN locale-gen en_US.UTF-8
+
+# Compact nvidia setup
+ENV LOCAL_USER_ID=${LOCAL_USER_ID}
+ENV NVIDIA_ENV=${NVIDIA_ENV}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libxau6 libxdmcp6 libxcb1 libxext6 libx11-6 && \
+    export NVIDIA_VISIBLE_DEVICES=all && \
+    export NVIDIA_DRIVER_CAPABILITIES=graphics,utility && \
+    /bin/sh -c echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf && \
+    echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf && \
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/local/nvidia/lib:/usr/local/nvidia/lib64 && \
+    apt-get update && apt-get install -y --no-install-recommends  \
+        libglvnd0 libgl1 libglx0 libegl1 libgles2 && \
+    apt-get update && apt-get install -y --no-install-recommends  \
+        pkg-config libglvnd-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev xterm
+
+# Robotology build
+
+# 
+ARG ROBOTOLOGY_SUPERBUILD_RELEASE=v2022.05.1
+ARG BUILD_TYPE=Release
+# WARNING: building into /usr will NOT work and will result in some enigmatic errors
+ARG ROBOTOLOGY_SUPERBUILD_INSTALL_DIR=/usr/local
+
+# # Set up git (required by superbuild)
+RUN git config --global user.name "GitHub Actions" && \
+    git config --global user.email "actions@github.com"
+
+# Install dependencies
+RUN git clone https://github.com/robotology/robotology-superbuild.git --depth 1 --branch ${ROBOTOLOGY_SUPERBUILD_RELEASE} && \
+    robotology-superbuild/scripts/install_apt_dependencies.sh
+
+
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' && \
+    wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add - && \
+    apt-get update && \
+    apt-get install -y libcgal-dev gazebo11 libgazebo11-dev
+
+# Build robotology-superbuild
+RUN cd robotology-superbuild && mkdir build && cd build && \
+    cmake .. \
+          -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+          -DYCM_EP_INSTALL_DIR=${ROBOTOLOGY_SUPERBUILD_INSTALL_DIR} \
+          -DROBOTOLOGY_ENABLE_CORE:BOOL=ON \
+          -DROBOTOLOGY_USES_GAZEBO:BOOL=ON && \
+    make -j $(expr $(nproc) + 1 )
+    # && \
+    #cd ../.. && rm -Rf robotology-superbuild
+
+# Clean up git configuration
+RUN git config --global --unset-all user.name && \
+    git config --global --unset-all user.email
+
+RUN apt-get update && apt-get install -y mc
+
+# caffeCoder requirements
+# RUN apt-get update && apt-get install -y libcaffe-cpu-dev caffe-cpu
+
+# stereo-vision requirements
+RUN apt-get update && apt-get install -y nvidia-cuda-toolkit
+
+# Launch bash from /workdir
+WORKDIR /workdir
+CMD ["bash"]

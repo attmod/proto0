@@ -24,7 +24,12 @@ yarpserver --write &
 
 
 ##  push this to background later ...
-yarpmanager-console --application /workdir/app/icub-gazebo.xml --run --connect --exit &
+# yarpmanager-console --application /workdir/app/icub-gazebo.xml --run --connect --exit &
+
+
+# interactive yarpmanager for testing
+cd /workdir
+yarpmanager &
 
 ##  ... and use a call like this to launch the system
 # yarp wait /icub-grasp/rpc

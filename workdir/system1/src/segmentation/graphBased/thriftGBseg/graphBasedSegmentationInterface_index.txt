@@ -1,0 +1,4 @@
+include/yarp/sig/Pixel.h
+src/Pixel.cpp
+include/yarp/sig/SegmentationModuleInterface.h
+src/SegmentationModuleInterface.cpp

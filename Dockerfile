@@ -4,6 +4,8 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+
+
 RUN apt-get update && apt-get install -y \
     apt-utils
 
@@ -68,6 +70,64 @@ RUN git config --global --unset-all user.name && \
     git config --global --unset-all user.email
 
 RUN apt-get update && apt-get install -y mc
+
+# caffeCoder requirements
+# RUN apt-get update && apt-get install -y libcaffe-cpu-dev caffe-cpu
+
+# stereo-vision requirements
+RUN apt-get update && apt-get install -y nvidia-cuda-toolkit
+# we will need nonfree opencv packages SIFT/SURF
+
+# ----- opencv start ------
+
+RUN apt-get remove -y opencv* libopencv*
+
+RUN apt-get install -y libfreetype-dev libharfbuzz-dev \
+                   libvtk7-dev libgtk-3-dev libgtkglext1-dev \
+                   python3 python3-dev python3-numpy \
+                   libavcodec-dev libavformat-dev libswscale-dev \
+                   libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev \
+                   libpng-dev libjpeg-dev libopenexr-dev libtiff-dev libwebp-dev \
+                   libeigen3-dev libgflags-dev libgoogle-glog-dev libatlas-base-dev libsuitesparse-dev
+
+RUN rm /usr/bin/gcc && \
+    rm /usr/bin/g++ && \
+    rm /usr/bin/cc && \
+    rm /usr/bin/c++ && \
+    ln -s /usr/bin/gcc-8 /usr/bin/gcc && \
+    ln -s /usr/bin/gcc-8 /usr/bin/cc && \
+    ln -s /usr/bin/g++-8 /usr/bin/g++ && \
+    ln -s /usr/bin/g++-8 /usr/bin/c++
+
+
+RUN mkdir -p /opencv && cd /opencv && \
+    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.2.0.zip && \
+    wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.2.0.zip && \
+    unzip opencv.zip && \
+    unzip opencv_contrib.zip
+
+RUN cd /opencv/opencv-4.2.0/ && \
+    mkdir build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+        -D PYTHON_EXECUTABLE=/usr/bin/python3 \
+        -D CMAKE_INSTALL_PREFIX=/usr \
+        -D WITH_CUDA=ON \
+        -D WITH_CUDNN=ON \
+        -D WITH_CUBLAS=ON \
+        -D WITH_TBB=ON \
+        -D OPENCV_DNN_CUDA=ON \
+        -D OPENCV_ENABLE_NONFREE=ON \
+        -D WITH_FREETYPE=ON \
+        -D WITH_VTK=ON \
+        -D CUDA_ARCH_BIN=6.1 \
+        -D OPENCV_EXTRA_MODULES_PATH=/opencv/opencv_contrib-4.2.0/modules \
+        -D BUILD_EXAMPLES=OFF \
+        -D HAVE_opencv_python3=ON .. && \
+    make -j $(expr $(nproc) + 1 ) && \
+    make install
+
+
+# ----- opencv end ------
 
 # Launch bash from /workdir
 WORKDIR /workdir

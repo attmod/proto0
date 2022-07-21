@@ -1,0 +1,76 @@
+<application>
+    <name>02 Logpolar</name>
+
+
+<!-- logpolarTransform.xml.template -->
+
+<module>
+    <name>logpolarTransform</name>
+    <parameters></parameters>
+    <node>localhost</node>
+    <tag>logpolarTransform</tag>
+ </module>
+ 
+ <module>
+    <name>logpolarTransform</name>
+    <parameters>--name inverselogpolarTransform  --direction logpolar2CARTESIAN</parameters>
+    <node>localhost</node>
+    <tag>inverselogpolarTransform</tag>
+ </module>
+ 
+ <module>
+    <name>yarpview</name>
+    <parameters>--name /inputImage --x 000 --y 0 --w 320 --h 318 </parameters>
+    <node>localhost</node>
+    <tag>inputImage</tag>
+ </module>
+ 
+ <module>
+    <name>yarpview</name>
+    <parameters>--name /logpolarImage --x 340 --y 0 --w 320 --h 318 </parameters>
+    <node>localhost</node>
+    <tag>logpolarImage</tag>
+ </module>
+ 
+ <module>
+    <name>yarpview</name>
+    <parameters>--name /cartesianImage --x 680 --y 0 --w 320 --h 318 </parameters>
+    <node>localhost</node>
+    <tag>cartesianImage</tag>
+ </module>
+ 
+ <connection>
+   <from>/icubSim/cam/left</from>
+   <to>/inputImage</to>
+   <protocol>tcp</protocol>
+ </connection>
+ 
+ <connection>
+   <from>/icubSim/cam/left</from>
+   <to>/logpolarTransform/image:i</to>
+   <protocol>tcp</protocol>
+ </connection>
+ 
+ <connection>
+   <from>/logpolarTransform/image:o</from>
+   <to>/logpolarImage</to>
+   <protocol>tcp</protocol>
+ </connection>
+ 
+ <connection>
+   <from>/logpolarTransform/image:o</from>
+   <to>/inverselogpolarTransform/image:i</to>
+   <protocol>tcp</protocol>
+ </connection>
+ 
+ <connection>
+   <from>/inverselogpolarTransform/image:o</from>
+   <to>/cartesianImage</to>
+   <protocol>tcp</protocol>
+ </connection>
+
+
+
+
+
+</application>
