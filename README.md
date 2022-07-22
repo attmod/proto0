@@ -98,12 +98,18 @@ https://github.com/robotology/segmentation
 - License: GPLv2
 
 https://github.com/robotology/visual-tracking-control
+- reaching spliced into tests/, requires superimposemesh
+- corrected glew to GLEW
+- BROKEN with cv::cvarrToMat
 
 https://github.com/robotology/visuomotor-learning
 
 
 https://github.com/attmod/tool-incorporation
 - for show3D, BROKEN
+
+https://github.com/robotology/superimpose-mesh-lib master da269af
+- compiles
 
 # License
 

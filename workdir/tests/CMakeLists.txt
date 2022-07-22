@@ -23,7 +23,3 @@ icubcontrib_set_default_prefix()
 # we keep the second part in src
 SET(SYSTEM1LIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 add_subdirectory(src)
-
-icubcontrib_finalize_export(tests)
-icubcontrib_set_default_prefix()
-#icubcontrib_add_uninstall_target() # disabled for now
