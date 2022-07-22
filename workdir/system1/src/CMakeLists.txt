@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-add_subdirectory(stereo-vision)
+#add_subdirectory(stereo-vision)
 
 # from robotology/segmentation
 # add_subdirectory(blobExtractor)

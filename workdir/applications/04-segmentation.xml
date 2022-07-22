@@ -58,13 +58,13 @@
         <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
     </connection>
     <connection>
-        <from external="true">/icub/camcalib/left/out</from>
+        <from external="true">/icubSim/cam/left/rgbImage:o</from>
         <to>/imLeft/yarpview/img:i</to>
         <protocol>udp</protocol>
         <geometry>(Pos ((x -1) (y -1)) ((x 164.25) (y 332.459)) ((x -85) (y 0))  )</geometry>
     </connection>
     <connection>
-        <from external="true">/icub/camcalib/left/out</from>
+        <from external="true">/icubSim/cam/left/rgbImage:o</from>
         <to>/SFM/left:i</to>
         <protocol>tcp</protocol>
         <geometry>(Pos ((x 132.103) (y 149.439)) ((x 164.25) (y 332.459)) ((x -69) (y -48))  )</geometry>
@@ -94,7 +94,7 @@
         <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -16)) ((x -85) (y 0))  )</geometry>
     </connection>
     <connection>
-        <from external="true">/icub/camcalib/left/out</from>
+        <from external="true">/icubSim/cam/left/rgbImage:o</from>
         <to>/seg2cloud/img:i</to>
         <protocol>udp</protocol>
         <geometry>(Pos ((x -1) (y -1)) ((x 164.25) (y 332.459)) ((x -86) (y 16))  )</geometry>
@@ -112,13 +112,13 @@
         <geometry>(Pos ((x -1) (y -1)) ((x 86) (y 16)) ((x 895.413) (y 667.136)) ((x 331.988) (y 659.311)) ((x -69) (y 48))  )</geometry>
     </connection>
     <connection>
-        <from external="true">/icub/camcalib/right/out</from>
+        <from external="true">/icubSim/cam/right/rgbImage:o</from>
         <to>/SFM/right:i</to>
         <protocol>tcp</protocol>
         <geometry>(Pos ((x 133.103) (y 192.939)) ((x 163.449) (y 377.163)) ((x -69) (y -16))  )</geometry>
     </connection>
     <connection>
-        <from external="true">/icub/camcalib/left/out</from>
+        <from external="true">/icubSim/cam/left/rgbImage:o</from>
         <to>/lbpExtract/image:i</to>
         <protocol>udp</protocol>
         <geometry>(Pos ((x -1) (y -1)) ((x 164.25) (y 332.459)) ((x -87) (y 0))  )</geometry>
@@ -130,4 +130,3 @@
         <geometry>(Pos ((x -1) (y -1)) ((x 86) (y 48)) ((x 449.617) (y 281.393))  )</geometry>
     </connection>
 </application>
-

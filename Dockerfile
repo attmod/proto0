@@ -129,6 +129,18 @@ RUN cd /opencv/opencv-4.2.0/ && \
 
 # ----- opencv end ------
 
+# install attmod/stereo-vision
+RUN mkdir -p /attmod && cd /attmod && \
+    git clone https://github.com/attmod/stereo-vision && \
+    cd stereo-vision && mkdir -p build && cd build && \
+    cmake ../ && \
+    make -j $(expr $(nproc) + 1 ) && \
+    make install
+
+# for show3D from tool-incorporation
+RUN apt-get update && apt-get install -y pcl-tools libpcl-dev
+
+
 # Launch bash from /workdir
 WORKDIR /workdir
 CMD ["bash"]

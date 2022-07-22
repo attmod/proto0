@@ -24,10 +24,9 @@ Overview
   - [ ] opencv: image threshold
   - [ ] opencv: contour detect
   - [ ] opencv: template for deep neural net
-  - [ ] yarp: stereo-vision
+  - [x] yarp: stereo-vision
     - provides SFM and disparity
   - [ ] yarp: segmentation
-    - BROKEN missing SFM package
   - [ ] yarp: caffe
     - requires: apt-get install -y nvidia-cuda-toolkit
     - BROKEN: cmake returns get_target_property() called with non-existent target "caffe".
@@ -85,7 +84,7 @@ https://github.com/robotology/himrep
 
 https://github.com/robotology/point-cloud-read
 
-https://github.com/robotology/stereo-vision master b54668b
+https://github.com/attmod/stereo-vision
 - set COMPILE_LIB, USE_SFM, and USE_DISPARITYMODULE all by default to TRUE
 - requires: apt-get install nvidia-cuda-toolkit
 - requires: nonfree in opencv contrib in 4.2 (ubuntu 22.04 can provide SIFT in normal packages in 4.4+), also WITH_FREETYPE=On and installed apt freetype and haarfbuz
@@ -102,6 +101,9 @@ https://github.com/robotology/visual-tracking-control
 
 https://github.com/robotology/visuomotor-learning
 
+
+https://github.com/attmod/tool-incorporation
+- for show3D, BROKEN
 
 # License
 

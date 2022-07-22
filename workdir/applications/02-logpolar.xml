@@ -40,13 +40,13 @@
  </module>
  
  <connection>
-   <from>/icubSim/cam/left</from>
+   <from>/icubSim/cam/left/rgbImage:o</from>
    <to>/inputImage</to>
    <protocol>tcp</protocol>
  </connection>
  
  <connection>
-   <from>/icubSim/cam/left</from>
+   <from>/icubSim/cam/left/rgbImage:o</from>
    <to>/logpolarTransform/image:i</to>
    <protocol>tcp</protocol>
  </connection>
