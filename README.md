@@ -20,7 +20,8 @@ Overview
   - [ ] yarp: logpolar
     - BROKEN, returns an error for array size and crashes when connecting camera image with yarp connect
   - [ ] opencv: template for convolution filter
-  - [ ] opencv: edge detect
+  - [x] opencv: edge detect
+    - imageProcessingEdge: sobel and canny, on 320x240 (SegFault on 640x480)
   - [ ] opencv: image threshold
   - [ ] opencv: contour detect
   - [ ] opencv: template for deep neural net

@@ -19,3 +19,5 @@ add_subdirectory(logpolar)
 # BROKEN
 # from robotology/himrep
 #add_subdirectory(caffeCoder)
+
+add_subdirectory(imageProcessingEdge)

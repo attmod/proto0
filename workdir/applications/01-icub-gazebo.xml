@@ -64,5 +64,20 @@
     </module>
 
 
+    <module>
+        <name>yarpview</name>
+        <parameters>--p 33 --x 700 --y 0 --out /disp/cam/right/out</parameters>
+        <node>localhost</node>
+        <prefix>/disp/cam/right</prefix>
+        <geometry>(Pos (x 953.073) (y 401.873))</geometry>
+    </module>
+    <connection>
+        <from>/icubSim/cam/right/rgbImage:o</from>
+        <to>/disp/cam/right/yarpview/img:i</to>
+        <protocol>udp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+
+
 
 </application>
