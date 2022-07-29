@@ -145,6 +145,7 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             responseFix.clear();
             responseFix.copy( *pc_object );
             responsePort.write();
+            yInfo() << "sent";
 
             Bottle& tableFix = tablePort.prepare();
             tableFix.clear();

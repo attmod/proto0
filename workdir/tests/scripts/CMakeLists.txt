@@ -1,0 +1,2 @@
+# Install the application
+yarp_install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/icub-tests.xml DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})

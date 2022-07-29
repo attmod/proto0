@@ -23,3 +23,5 @@ icubcontrib_set_default_prefix()
 # we keep the second part in src
 SET(SYSTEM1LIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 add_subdirectory(src)
+add_subdirectory(scripts)
+

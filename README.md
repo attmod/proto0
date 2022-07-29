@@ -17,7 +17,7 @@ Overview
   - Consider dockyman for running later, if still using X.org forwarding
   - code inside - single cmake/make combo for all
 - [ ] developing the perception module (c++ separate file)
-  - [ ] template: image-to-image
+  - [x] template: image-to-image
   - [ ] template: image-to-point
   - [ ] template: image-to-float
   - [ ] yarp: logpolar
@@ -31,20 +31,29 @@ Overview
   - [ ] opencv: template for deep neural net
   - [x] yarp: stereo-vision
     - provides SFM and disparity
-  - [x] yarp: segmentation
+  - [x] yarp: attmod/segmentation
     - [ ] sync all changes
     - [ ] add attmod/segmentation to a Dockerfile
+  - [x] vtk: segmentation
+    - with table:o for table height and /out pointcloud of detected shape/shapes
+    - [ ] blob for fetching central point from 3d cloud?
+      - PCL centroid https://pointclouds.org/documentation/classpcl_1_1_centroid_point.html
   - [ ] yarp: caffe
     - requires: apt-get install -y nvidia-cuda-toolkit
     - BROKEN: cmake returns get_target_property() called with non-existent target "caffe".
 - [ ] developing action module (c++ separate file)
-  - [ ] micro_grasp: separation of action low-level api in progress
+  - [x] micro_grasp
+  - [ ] move proper motion to external manager with inhibition and action queue
   - [ ] external validation for completation of action (not waitMotionDone, a metric)
   - [x] gaze control with simple vector streaming
 - [ ] creating actions (reaching, grasping, pointing) and testing on Gazebo
-  - [ ] reaching: define radius for vicinity of target
-  - [ ] pointing: line between target and hand orientation,
-  - [ ] grasping: micro_grasp: cardinal points for generation
+  - [x] reaching: define radius for vicinity of target
+    - first working sketch in micro_grasp
+  - [ ] pointing: line between target and hand orientation
+    - crashes on hand calculations
+  - [x] grasping: micro_grasp: cardinal points for generation of grasps
+    - supports both reach and grasp
+    - [ ] move fully to nonsync
 - [ ] defining target functions that validate the actions. They return TRUE once the action is successful
   - this is a second stage, for point/reach/grasp level, not action
 - [ ] defining a set of visual features needed for achieving the actions. Input to the action modules
