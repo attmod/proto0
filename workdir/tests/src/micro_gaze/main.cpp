@@ -127,8 +127,8 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             yInfo() << "Bottle received looks like" << msg0->toString().c_str();
             Vector fp(3);
             fp[0]=msg0->get(0).asFloat64();
-            fp[1]=msg0->get(0).asFloat64();
-            fp[2]=msg0->get(0).asFloat64();
+            fp[1]=msg0->get(1).asFloat64();
+            fp[2]=msg0->get(2).asFloat64();
             igaze->lookAtFixationPoint(fp);
         }
 
