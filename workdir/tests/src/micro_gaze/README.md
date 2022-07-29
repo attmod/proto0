@@ -1,12 +1,13 @@
 # About
 
-This is template for image-to-image manipulation in yarp
-
-Includes a simple rpc interface
+Gaze control - fixation point in and out
 
 # Usage
 
 
+Preview
+
+    yarpscope --remote /micro_gaze/out --index "(0,1,2)"
 
 
 
