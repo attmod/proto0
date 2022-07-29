@@ -9,6 +9,7 @@ add_subdirectory(micro_grasp)
 add_subdirectory(micro_gaze)
 add_subdirectory(micro_segment)
 add_subdirectory(micro_pointcloud_viewer)
+add_subdirectory(micro_orientation)
 
 # add_subdirectory(micro_point)
 

@@ -27,7 +27,8 @@ Overview
     - imageProcessingEdge: sobel and canny, on 320x240 (SegFault on 640x480)
   - [ ] opencv: image threshold
   - [ ] opencv: contour detect
-  - [ ] opencv: orientation detect
+  - [x] opencv: orientation detect
+  - [ ] yarp: orientation detect (find-superquadric)
   - [ ] opencv: template for deep neural net
   - [x] yarp: stereo-vision
     - provides SFM and disparity
@@ -57,12 +58,15 @@ Overview
 - [ ] defining target functions that validate the actions. They return TRUE once the action is successful
   - this is a second stage, for point/reach/grasp level, not action
 - [ ] defining a set of visual features needed for achieving the actions. Input to the action modules
+  - Bekkering: color, orientation, position
 - [ ] defining a rate for each perception/action module
   - (current VGA camera setup tops out at 640x480 with 15fps on the real robot)
   - try to include graphs with delays introduced at each stage (Gannt-style)
-  - when using rfmodules: try parametrisation of the update rate
+  - [x] when using rfmodules: try parametrisation of the update rate
 - [ ] defining cost functions for each perception/action module
+  - [ ] reaction time between object teleport (see below) and start of the processing in each module until the action is locked
 - [ ] create simulation for playing the actions and showing the evolution of validate and cost functions 
+  - [ ] teleport objects of interest into the robot's viewport
 - [ ] (optional) statistics of cost functions respect to the different actions
 
 # Running
