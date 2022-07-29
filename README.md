@@ -17,27 +17,41 @@ Overview
   - Consider dockyman for running later, if still using X.org forwarding
   - code inside - single cmake/make combo for all
 - [ ] developing the perception module (c++ separate file)
+  - [ ] template: image-to-image
+  - [ ] template: image-to-point
+  - [ ] template: image-to-float
   - [ ] yarp: logpolar
     - BROKEN, returns an error for array size and crashes when connecting camera image with yarp connect
-  - [ ] opencv: template for convolution filter
+  - [x] opencv: template for convolution filter
   - [x] opencv: edge detect
     - imageProcessingEdge: sobel and canny, on 320x240 (SegFault on 640x480)
   - [ ] opencv: image threshold
   - [ ] opencv: contour detect
+  - [ ] opencv: orientation detect
   - [ ] opencv: template for deep neural net
   - [x] yarp: stereo-vision
     - provides SFM and disparity
-  - [ ] yarp: segmentation
+  - [x] yarp: segmentation
+    - [ ] sync all changes
+    - [ ] add attmod/segmentation to a Dockerfile
   - [ ] yarp: caffe
     - requires: apt-get install -y nvidia-cuda-toolkit
     - BROKEN: cmake returns get_target_property() called with non-existent target "caffe".
 - [ ] developing action module (c++ separate file)
+  - [ ] micro_grasp: separation of action low-level api in progress
+  - [ ] external validation for completation of action (not waitMotionDone, a metric)
+  - [x] gaze control with simple vector streaming
 - [ ] creating actions (reaching, grasping, pointing) and testing on Gazebo
+  - [ ] reaching: define radius for vicinity of target
+  - [ ] pointing: line between target and hand orientation,
+  - [ ] grasping: micro_grasp: cardinal points for generation
 - [ ] defining target functions that validate the actions. They return TRUE once the action is successful
+  - this is a second stage, for point/reach/grasp level, not action
 - [ ] defining a set of visual features needed for achieving the actions. Input to the action modules
 - [ ] defining a rate for each perception/action module
-  - current VGA camera setup tops out at 640x480 with 15fps on the real robot
+  - (current VGA camera setup tops out at 640x480 with 15fps on the real robot)
   - try to include graphs with delays introduced at each stage (Gannt-style)
+  - when using rfmodules: try parametrisation of the update rate
 - [ ] defining cost functions for each perception/action module
 - [ ] create simulation for playing the actions and showing the evolution of validate and cost functions 
 - [ ] (optional) statistics of cost functions respect to the different actions
