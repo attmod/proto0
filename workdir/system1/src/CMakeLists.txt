@@ -14,10 +14,10 @@ add_subdirectory(segmentation)
 
 # Compiles, but broken on connect
 # from robotology/logpolar
-add_subdirectory(logpolar)
+# add_subdirectory(logpolar)
 
 # BROKEN
 # from robotology/himrep
-#add_subdirectory(caffeCoder)
+# add_subdirectory(caffeCoder)
 
 add_subdirectory(imageProcessingEdge)
