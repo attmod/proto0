@@ -7,6 +7,32 @@ Overview
 - No grasping, just inverse kinematics and moving the hand to the proximity of the object - orientation of the hand as the parameter, but simple open/close
 - Simple convolutional filters for edge detection, disparity maps
 
+# Running
+
+Makefile for building and running includes `make build` and `make run`, or both as
+
+    make
+
+Closing the terminator terminal window closes everything.
+
+Currently nvidia gpu support is included in docker-compose file, turn off when on intel/amd machine. Required by some modules (stereo-vision).
+
+system1 is can be build and launched by executing
+
+    ./go
+
+which will cmake/make/install the system1 project and launch `yarpmanager`.
+
+
+`tests` are NOT being build automatically in the Dockerfile, after running the container you have to build it manually:
+
+    cd /workdir/tests && mkdir -p build && cd build
+    cmake ../
+    make && make install
+
+
+
+
 # Checklist
 
 - [x] create github repository
@@ -34,7 +60,7 @@ Overview
     - provides SFM and disparity
   - [x] yarp: attmod/segmentation
     - [ ] sync all changes
-    - [ ] add attmod/segmentation to a Dockerfile
+    - [x] add attmod/segmentation to a Dockerfile
   - [x] vtk: segmentation
     - with table:o for table height and /out pointcloud of detected shape/shapes
     - [ ] blob for fetching central point from 3d cloud?
@@ -57,33 +83,22 @@ Overview
     - [ ] move fully to nonsync
 - [ ] defining target functions that validate the actions. They return TRUE once the action is successful
   - this is a second stage, for point/reach/grasp level, not action
-- [ ] defining a set of visual features needed for achieving the actions. Input to the action modules
+- [x] defining a set of visual features needed for achieving the actions. Input to the action modules
   - Bekkering: color, orientation, position
+    - [ ] color support
+    - [x] orientation support
+    - [ ] position support
 - [ ] defining a rate for each perception/action module
   - (current VGA camera setup tops out at 640x480 with 15fps on the real robot)
   - try to include graphs with delays introduced at each stage (Gannt-style)
   - [x] when using rfmodules: try parametrisation of the update rate
+  - [ ] single xml for yarpscope to show current effective rates for all modules
 - [ ] defining cost functions for each perception/action module
   - [ ] reaction time between object teleport (see below) and start of the processing in each module until the action is locked
-- [ ] create simulation for playing the actions and showing the evolution of validate and cost functions 
+- [ ] create simulation for playing the actions and showing the evolution of validate and cost functions
+  - [ ] .xml and .sh files to auto load everything
   - [ ] teleport objects of interest into the robot's viewport
 - [ ] (optional) statistics of cost functions respect to the different actions
-
-# Running
-
-Makefile for building and running includes make build and make run, or both as
-
-    make
-
-Closing the terminator terminal window closes everything.
-
-Currently nvidia gpu support is included in docker-compose file, turn off when on intel/amd machine. Required by some modules (stereo-vision).
-
-system1 is NOT being build automatically in the Dockerfile, after running the container you have to build it manually:
-
-    cd /workdir/system1 && mkdir -p build && cd build
-    cmake ../
-    make && make install
 
 
 # Spliced repositories

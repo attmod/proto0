@@ -84,6 +84,7 @@ class ProcessingModule : public RFModule, public rpc_IDL {
 
         requestPort.open("/"+name+"/in");
         responsePort.open("/"+name+"/out");
+        rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
 
         return true;

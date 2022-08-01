@@ -29,7 +29,7 @@ yarpserver --write &
 
 # interactive yarpmanager for testing
 cd /workdir
-yarpmanager &
+# yarpmanager &
 
 ##  ... and use a call like this to launch the system
 # yarp wait /icub-grasp/rpc

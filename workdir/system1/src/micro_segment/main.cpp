@@ -105,7 +105,7 @@ class ProcessingModule : public RFModule, public rpc_IDL {
 
         rgbPort.open("/"+name+"/rgb:i");
         depthPort.open("/"+name+"/depth:i");
-
+        rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
 
         return true;

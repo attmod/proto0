@@ -1,0 +1,74 @@
+<application>
+    <name>iCub system1</name>
+
+<!--  micro_orientation -->
+
+    <module>
+        <name>micro_orientation</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/icubSim/cam/right/rgbImage:o</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "micro_orientation" -e "yarp read /read /micro_orientation/out"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/micro_orientation/out</port>
+        </dependencies>
+    </module>
+
+    <connection>
+        <from>/icubSim/cam/right/rgbImage:o</from>
+        <to>/micro_orientation/in</to>
+        <protocol>udp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+
+<!-- micro_gaze -->
+
+<module>
+    <name>micro_gaze</name>
+    <parameters></parameters>
+    <node>localhost</node>
+    <dependencies>
+        <port timeout="20">/iKinGazeCtrl/rpc</port>
+    </dependencies>
+</module>
+
+<module>
+    <name>xterm</name>
+    <parameters>-bg black -fg white -T "micro_gaze control" -e "yarp write /write/gaze /micro_gaze/in"</parameters>
+    <node>localhost</node>
+    <dependencies>
+        <port timeout="20">/micro_gaze/in</port>
+    </dependencies>
+</module>
+
+<module>
+    <name>yarpscope</name>
+    <parameters>--remote /micro_gaze/out --index "(0,1,2)"</parameters>
+    <node>localhost</node>
+    <dependencies>
+        <port timeout="20">/micro_gaze/out</port>
+    </dependencies>
+</module>
+
+<!-- micro_segment -->
+
+<module>
+    <name>micro_segment</name>
+    <parameters></parameters>
+    <node>localhost</node>
+    <dependencies>
+        <port timeout="20">/icubSim/cam/left/depthImage:o</port>
+    </dependencies>
+</module>
+
+<!-- -->
+
+
+</application>
