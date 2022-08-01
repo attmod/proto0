@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.12)
 # add_subdirectory(lbpExtract)
 # add_subdirectory(lumaChroma)
 # add_subdirectory(seg2cloud)
-add_subdirectory(segmentation)
+# add_subdirectory(segmentation)
 
 # Compiles, but broken on connect
 # from robotology/logpolar

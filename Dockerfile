@@ -148,6 +148,13 @@ RUN mkdir -p /attmod && cd /attmod && \
     make -j $(expr $(nproc) + 1 ) && \
     make install
 
+# install attmod/stereo-vision
+RUN mkdir -p /attmod && cd /attmod && \
+    git clone https://github.com/attmod/segmentation && \
+    cd segmentation && mkdir -p build && cd build && \
+    cmake ../ && \
+    make -j $(expr $(nproc) + 1 ) && \
+    make install
 
 # Launch bash from /workdir
 WORKDIR /workdir
