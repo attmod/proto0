@@ -53,6 +53,8 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - [x] opencv: contour detect
   - [x] opencv: orientation detect
   - [ ] yarp: orientation detect (find-superquadric)
+  - [x] opencv: blob detection, with blur for merging loose points (other method?)
+    - [ ] add threshold after blur
   - [x] yarp: stereo-vision
     - provides SFM and disparity
   - [x] yarp: attmod/segmentation
@@ -64,11 +66,12 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - [ ] yarp: caffe
     - requires: apt-get install -y nvidia-cuda-toolkit
     - BROKEN: cmake returns get_target_property() called with non-existent target "caffe".
-- [ ] developing action module (c++ separate file)
+- [x] developing action module (c++ separate file)
   - [x] micro_grasp
-  - [ ] move proper motion to external manager with inhibition and action queue
-    - [ ] move the selection from port to rpc call
-    - [ ] periodic output needs set_rate, get_rate
+  - [x] action selection
+    - [x] move the selection from port to rpc call
+    - [x] periodic output needs set_rate, get_rate
+    - [ ] inhibit all
   - [ ] external validation for completation of action (not waitMotionDone, a metric)
   - [x] gaze control with simple vector streaming
 - [ ] creating actions (reaching, grasping, pointing) and testing on Gazebo

@@ -39,6 +39,77 @@ int main() {
 }
 ```
 
+# Timestamps!
+
+http://wiki.icub.org/wiki/Timestamps_in_YARP
+
+Read for checking envelopes:
+
+    yarp read /r1 envelope /port
+
+envelope on normal ports on high frequency can be out of sync https://github.com/robotology/yarp/issues/610, also on bufferedports, but callbacks with buffered ports should be safe?
+
+
+
+## Additional fields
+
+Additional fields? You can reimplement the Stamp or the Header - they are supposed to be compatible. Or Portable for more general class.
+
+https://yarp.it/latest//classyarp_1_1os_1_1Header.html
+
+https://www.yarp.it/latest/classyarp_1_1os_1_1Portable.html
+
+See int issue for counters in Stamp/Header https://github.com/robotology/yarp/issues/2365
+
+Writing documentation and example for Portable
+
+https://www.yarp.it/latest/port_expert.html
+
+```cpp
+class Target : public Portable {
+public:
+  int x;
+  int y;
+  bool write(ConnectionWriter& connection) override
+  {
+    connection.appendInt32(x);
+    connection.appendInt32(y);
+    return true;
+  }
+  bool read(ConnectionReader& connection) override
+  {
+    x = connection.expectInt32();
+    y = connection.expectInt32();
+    return !connection.isError();
+  }
+};
+```
+
+and better read/write:
+
+```cpp
+
+bool write(ConnectionWriter& connection) override
+{
+  connection.appendInt32(BOTTLE_TAG_LIST+BOTTLE_TAG_INT32);
+  connection.appendInt32(2); // two elements
+  connection.appendInt32(x);
+  connection.appendInt32(y);
+  connection.convertTextMode(); // if connection is text-mode, convert!
+  return true;
+}
+bool read(ConnectionReader& connection) override
+{
+  connection.convertTextMode(); // if connection is text-mode, convert!
+  int tag = connection.expectInt32();
+  if (tag!=BOTTLE_TAG_LIST+BOTTLE_TAG_INT32) return false;
+  int ct = connection.expectInt32();
+  if (ct!=2) return false;
+  x = connection.expectInt32();
+  y = connection.expectInt32();
+  return !connection.isError();
+}
+```
 
 
 # Issue rpc commands quickly
@@ -127,6 +198,33 @@ DataPort p;
 p.useCallback();  // input should go to onRead() callback
 p.open("/in");
 ```
+
+# Thrift data types
+
+```cpp
+    bool: bool
+
+    binary: std::string
+
+    byte: int8_t
+
+    i16: int16_t
+
+    i32: int32_t
+
+    i64: int64_t
+
+    double: double
+
+    string: std::string
+
+    list<t1>: std::vector<t1>
+
+    set<t1>: std::set<t1>
+
+    map<t1,t2>: std::map<T1, T2>
+```
+
 
 # yarpmanager
 
