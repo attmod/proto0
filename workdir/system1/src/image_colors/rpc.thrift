@@ -36,8 +36,27 @@ service rpc_IDL
    bool set_rate(1:double rate);
 
    /**
-   * Set the update rate
+   * Set the min area
    * @return true/false on success/failure.
    */
-   int get_rate();
+   bool set_min(1:double minarea);
+
+   /**
+   * Set the max area
+   * @return true/false on success/failure.
+   */
+   bool set_max(1:double maxarea);
+
+   bool set_red();
+   bool set_green();
+   bool set_yellow();
+   bool set_purple();
+   bool set_blue();
+
+   /**
+   * Get the color
+   * @return true/false on success/failure.
+   */
+   string get_color();
+
 }

@@ -2,6 +2,10 @@
 
 https://icub-tech-iit.github.io/documentation/icub_kinematics/icub-forward-kinematics/icub-forward-kinematics/
 
+# Cartesian interface
+
+https://robotology.github.io/robotology-documentation/doc/html/icub_cartesian_interface.html
+
 
 # Gaze documentation
 
@@ -20,33 +24,109 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 int main() {
-  Vector v(3);
-  v[0] = 1.2;
-  v[1] = 2.3;
-  v[2] = 4.4;
-  Bottle b;
-  b.addString("hello");
-  b.addList().read(v);
-  printf("bottle is %s\n", b.toString().c_str());
-  Vector v2;
-  b.get(1).asList()->write(v2);
-  printf("Vector is %s\n", v2.toString().c_str());
-  return 0;
+    Vector v(3);
+    v[0] = 1.2;
+    v[1] = 2.3;
+    v[2] = 4.4;
+    Bottle b;
+    b.addString("hello");
+    b.addList().read(v);
+    printf("bottle is %s\n", b.toString().c_str());
+    Vector v2;
+    b.get(1).asList()->write(v2);
+    printf("Vector is %s\n", v2.toString().c_str());
+    return 0;
 }
 ```
+
+
 
 # Issue rpc commands quickly
 
     echo go | yarp rpc /icub-grasp/rpc
 
+# Standard read and write - with xterm
+
+Command for yarpmanager to execute
+
+    yarp read /read /micro_orientation/out
+
+```xml
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "micro_orientation" -e "yarp read /read /micro_orientation/out"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/micro_orientation/out</port>
+        </dependencies>
+    </module>
+```
+
+and
+
+    yarp write /write/gaze /micro_gaze/in
+
+```xml
+<module>
+    <name>xterm</name>
+    <parameters>-bg black -fg white -T "micro_gaze control" -e "yarp write /write/gaze /micro_gaze/in"</parameters>
+    <node>localhost</node>
+    <dependencies>
+        <port timeout="20">/micro_gaze/in</port>
+    </dependencies>
+</module>
+```
 
 
+# Time and framerate - official example
+
+https://www.yarp.it/git-master/framerate_2main_8cpp-example.html
+
+# Point clouds
+
+https://www.yarp.it/latest/group__yarp__pointcloud.html
+
+Finding a centroid point:
+
+https://pointclouds.org/documentation/classpcl_1_1_centroid_point.html
 
 
+# Math operations
 
+https://robotology.github.io/robotology-documentation/doc/html/group__Maths.html
 
+```cpp
+double 	iCub::ctrl::dot (const yarp::sig::Matrix &A, int colA, const yarp::sig::Matrix &B, int colB)
+ 
+double 	iCub::ctrl::norm2 (const yarp::sig::Matrix &M, int col)
+ 
+double 	iCub::ctrl::norm (const yarp::sig::Matrix &M, int col)
+ 
+yarp::sig::Vector 	iCub::ctrl::cross (const yarp::sig::Matrix &A, int colA, const yarp::sig::Matrix &B, int colB)
+ 
+yarp::sig::Vector 	iCub::ctrl::Dcross (const yarp::sig::Vector &a, const yarp::sig::Vector &Da, const yarp::sig::Vector &b, const yarp::sig::Vector &Db)
+ 
+yarp::sig::Vector 	iCub::ctrl::Dcross (const yarp::sig::Matrix &A, const yarp::sig::Matrix &DA, int colA, const yarp::sig::Matrix &B, const yarp::sig::Matrix &DB, int colB)
+```
 
+# Callbacks on ports
 
+https://www.yarp.it/latest/port_expert.html
+
+```cpp
+class DataPort : public BufferedPort<Bottle>
+{
+    using BufferedPort<Bottle>::onRead;
+    void onRead(Bottle& b) override
+    {
+        // process data in b
+    }
+};
+...
+DataPort p;
+p.useCallback();  // input should go to onRead() callback
+p.open("/in");
+```
 
 # yarpmanager
 

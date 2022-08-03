@@ -36,8 +36,15 @@ service rpc_IDL
    bool set_rate(1:double rate);
 
    /**
-   * Set the update rate
+   * Set the min area
    * @return true/false on success/failure.
    */
-   int get_rate();
+   bool set_min(1:double minarea);
+
+   /**
+   * Set the max area
+   * @return true/false on success/failure.
+   */
+   bool set_max(1:double maxarea);
+
 }

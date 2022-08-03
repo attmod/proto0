@@ -26,6 +26,6 @@ add_subdirectory(src)
 
 add_subdirectory(scripts)
 
-icubcontrib_finalize_export(system1)
+#icubcontrib_finalize_export(system1) # this caused suddenly an error with install
 icubcontrib_set_default_prefix()
 #icubcontrib_add_uninstall_target() # disabled for now

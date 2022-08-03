@@ -1,12 +1,13 @@
 # About
 
-This is template for image-to-image manipulation in yarp
+This is a test package for checking GPU code for color detection.
 
-Includes a simple rpc interface
+Necessary if resolution bump and fps bump will decrease the fps of classic color detection (inRange)
+
+
+
 
 # Usage
-
-
 
 
 

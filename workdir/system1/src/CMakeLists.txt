@@ -20,7 +20,9 @@ cmake_minimum_required(VERSION 3.12)
 # from robotology/himrep
 # add_subdirectory(caffeCoder)
 
-add_subdirectory(imageProcessingEdge)
+add_subdirectory(image_colors)
+add_subdirectory(image_colors_gpu)
+add_subdirectory(image_edges)
 
 add_subdirectory(micro_grasp)
 add_subdirectory(micro_gaze)

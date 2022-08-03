@@ -48,6 +48,34 @@ using namespace yarp::dev;
 using namespace yarp::sig;
 using namespace yarp::math;
 
+// https://robotology.github.io/robotology-documentation/doc/html/icub_gaze_interface.html
+// https://www.yarp.it/latest/port_expert.html
+class Gaze2DPixelPort : public BufferedPort<Bottle>
+{
+    public:
+        IGazeControl *igaze=NULL;
+
+    private:
+        using BufferedPort<Bottle>::onRead;
+        void onRead(Bottle& b) override
+        {
+            if( b.size() >= 3 ) {
+                int camSel=0;   // select the image plane: 0 (left), 1 (right)
+        
+                Vector px(2);   // specify the pixel where to look
+                px[0]=b.get(0).asFloat64();
+                px[1]=b.get(1).asFloat64();
+        
+                double z=b.get(2).asFloat64();   // distance [m] of the object from the image plane (extended to infinity): yes, you probably need to guess, but it works pretty robustly
+        
+                Vector x;
+                igaze->get3DPoint(camSel,px,z,x);
+                igaze->lookAtFixationPoint(x);
+            }
+        }
+};
+
+
 /******************************************************************************/
 class ProcessingModule : public RFModule, public rpc_IDL {
 
@@ -58,7 +86,7 @@ class ProcessingModule : public RFModule, public rpc_IDL {
     
     BufferedPort<Bottle> requestPort; // in: vector xyz where to fixate
     BufferedPort<Bottle> responsePort; // out: vector xyz where we are fixated
-
+    Gaze2DPixelPort gaze2DPixelPort;
     double requestedPeriod = 0.010;
 
     bool attach(RpcServer& source) override {
@@ -86,6 +114,13 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         responsePort.open("/"+name+"/out");
         rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
+
+        // this uses callbacks and you can leave it be
+        if (clientGazeCtrl.isValid()) {
+            clientGazeCtrl.view(gaze2DPixelPort.igaze);
+        }
+        gaze2DPixelPort.useCallback();  // input should go to onRead() callback
+        gaze2DPixelPort.open("/"+name+"/pixel2D:i");
 
         return true;
     }
