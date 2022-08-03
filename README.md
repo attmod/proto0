@@ -43,23 +43,19 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - Consider dockyman for running later, if still using X.org forwarding
   - code inside - single cmake/make combo for all
 - [ ] developing the perception module (c++ separate file)
-  - [x] template: image-to-image
-  - [ ] template: image-to-point
-  - [ ] template: image-to-float
+  - [x] template: image-to-image, image-to-point, image-to-gloat
   - [ ] yarp: logpolar
     - BROKEN, returns an error for array size and crashes when connecting camera image with yarp connect
   - [x] opencv: template for convolution filter
   - [x] opencv: edge detect
     - imageProcessingEdge: sobel and canny, on 320x240 (SegFault on 640x480)
-  - [ ] opencv: image threshold
-  - [ ] opencv: contour detect
+  - [x] opencv: image threshold
+  - [x] opencv: contour detect
   - [x] opencv: orientation detect
   - [ ] yarp: orientation detect (find-superquadric)
-  - [ ] opencv: template for deep neural net
   - [x] yarp: stereo-vision
     - provides SFM and disparity
   - [x] yarp: attmod/segmentation
-    - [ ] sync all changes
     - [x] add attmod/segmentation to a Dockerfile
   - [x] vtk: segmentation
     - with table:o for table height and /out pointcloud of detected shape/shapes
@@ -71,6 +67,8 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
 - [ ] developing action module (c++ separate file)
   - [x] micro_grasp
   - [ ] move proper motion to external manager with inhibition and action queue
+    - [ ] move the selection from port to rpc call
+    - [ ] periodic output needs set_rate, get_rate
   - [ ] external validation for completation of action (not waitMotionDone, a metric)
   - [x] gaze control with simple vector streaming
 - [ ] creating actions (reaching, grasping, pointing) and testing on Gazebo
@@ -85,18 +83,20 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - this is a second stage, for point/reach/grasp level, not action
 - [x] defining a set of visual features needed for achieving the actions. Input to the action modules
   - Bekkering: color, orientation, position
-    - [ ] color support
+    - [x] color support
     - [x] orientation support
     - [ ] position support
-- [ ] defining a rate for each perception/action module
+- [x] defining a rate for each perception/action module
   - (current VGA camera setup tops out at 640x480 with 15fps on the real robot)
   - try to include graphs with delays introduced at each stage (Gannt-style)
   - [x] when using rfmodules: try parametrisation of the update rate
+  - [x] return true update rate
+  - [x] direct callbacks
   - [ ] single xml for yarpscope to show current effective rates for all modules
 - [ ] defining cost functions for each perception/action module
   - [ ] reaction time between object teleport (see below) and start of the processing in each module until the action is locked
 - [ ] create simulation for playing the actions and showing the evolution of validate and cost functions
-  - [ ] .xml and .sh files to auto load everything
+  - [x] .xml and .sh files to auto load everything
   - [ ] teleport objects of interest into the robot's viewport
 - [ ] (optional) statistics of cost functions respect to the different actions
 
