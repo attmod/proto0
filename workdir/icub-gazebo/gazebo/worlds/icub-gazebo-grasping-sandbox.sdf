@@ -40,7 +40,7 @@
       <pose>-0.530772 0 0 0 0 -1.57</pose>
     </include>
 
-    <include>
+<!--    <include>
       <uri>model://mustard_bottle</uri>
       <pose>-0.4 0.6 0.51 0 0 1.8</pose>
       <plugin name="pose_mover" filename='libicub-gazebo-grasping-sandbox-model-mover.so'/>
@@ -68,7 +68,16 @@
       <uri>model://pudding_box</uri>
       <pose>-0.5 0.6 0.5 0 0 1.57</pose>
       <plugin name="pose_mover" filename='libicub-gazebo-grasping-sandbox-model-mover.so'/>
+    </include> -->
+
+
+    <include>
+      <uri>model://bekkering</uri>
+      <pose>-0.277 0.636 0.482 0 0 0</pose>
+      <plugin name="pose_mover" filename='libgazebo_teleporter.so'/>
     </include>
+
+
 
     <model name="iCub">
       <include>

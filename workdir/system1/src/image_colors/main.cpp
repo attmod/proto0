@@ -82,6 +82,8 @@ class ProcessingModule : public RFModule, public rpc_IDL {
     cv::Scalar purpleHigh = cv::Scalar(152, 255, 255);
     cv::Scalar redLow = cv::Scalar(170, 140, 160);
     cv::Scalar redHigh = cv::Scalar(180, 255, 255);
+    cv::Scalar orangeLow = cv::Scalar(15, 200, 80);
+    cv::Scalar orangeHigh = cv::Scalar(20, 255, 255);
 
     cv::Scalar low;
     cv::Scalar high;
@@ -178,6 +180,10 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             low = purpleLow;
             high = purpleHigh;
             color = "purple";
+        } else if ( !strcmp( clr.c_str(), "orange" ) ) {
+            low = orangeLow;
+            high = orangeHigh;
+            color = "orange";
         } else {
             return false;
         }
@@ -189,6 +195,13 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             low = redLow;
             high = redHigh;
             color = "red";
+            return true;
+    }
+
+    bool orange() override {
+            low = orangeLow;
+            high = orangeHigh;
+            color = "orange";
             return true;
     }
 
@@ -216,6 +229,13 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             low = purpleLow;
             high = purpleHigh;
             color = "purple";
+            return true;
+    }
+
+    bool set_color(int32_t newlow1, int32_t newlow2, int32_t newlow3, int32_t newhigh1, int32_t newhigh2, int32_t newhigh3) override {
+            low = cv::Scalar(newlow1, newlow2, newlow3);;
+            high = cv::Scalar(newhigh1, newhigh2, newhigh3);;
+            color = "custom";
             return true;
     }
 

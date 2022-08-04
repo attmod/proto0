@@ -158,6 +158,16 @@
         </dependencies>
     </module>
 
+<!-- gazebo teleporter -->
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "gazebo teleporter: bekkering" -e "yarp write /write/bekkering /bekkering/model-mover/delta-pose:i"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/bekkering/model-mover/delta-pose:i</port>
+        </dependencies>
+    </module>
 
 
 </application>
