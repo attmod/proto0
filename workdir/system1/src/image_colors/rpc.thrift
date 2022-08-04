@@ -47,11 +47,11 @@ service rpc_IDL
    */
    bool set_max(1:double maxarea);
 
-   bool set_red();
-   bool set_green();
-   bool set_yellow();
-   bool set_purple();
-   bool set_blue();
+   bool red();
+   bool green();
+   bool yellow();
+   bool purple();
+   bool blue();
 
    /**
    * Get the color

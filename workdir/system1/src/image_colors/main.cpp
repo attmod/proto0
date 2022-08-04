@@ -185,34 +185,39 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         return true;
     }
 
-    // bool set_red() override {
-    //         low = redLow;
-    //         high = redHigh;
-    //         //color = "red";
-    // }
+    bool red() override {
+            low = redLow;
+            high = redHigh;
+            color = "red";
+            return true;
+    }
 
-    // bool set_blue() override {
-    //         low = blueLow;
-    //         high = blueHigh;
-    //         //color = "blue";
-    // }
+    bool blue() override {
+            low = blueLow;
+            high = blueHigh;
+            color = "blue";
+            return true;
+    }
 
-    // bool set_green() override {
-    //         low = greenLow;
-    //         high = greenHigh;
-    //         //color = "green";
-    // }
+    bool green() override {
+            low = greenLow;
+            high = greenHigh;
+            color = "green";
+            return true;
+    }
 
-    // bool set_yellow() override {
-    //         low = yellowLow;
-    //         high = yellowHigh;
-    //         //color = "yellow";
-    // }
-    // bool set_purple() override {
-    //         low = purpleLow;
-    //         high = purpleHigh;
-    //         //color = "purple";
-    // }
+    bool yellow() override {
+            low = yellowLow;
+            high = yellowHigh;
+            color = "yellow";
+            return true;
+    }
+    bool purple() override {
+            low = purpleLow;
+            high = purpleHigh;
+            color = "purple";
+            return true;
+    }
 
 
     string get_color() override {

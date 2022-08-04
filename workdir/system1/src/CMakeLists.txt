@@ -23,8 +23,11 @@ cmake_minimum_required(VERSION 3.12)
 add_subdirectory(image_colors)
 add_subdirectory(image_colors_gpu)
 add_subdirectory(image_edges)
+add_subdirectory(image_blob)
+
 
 add_subdirectory(micro_grasp)
 add_subdirectory(micro_gaze)
 add_subdirectory(micro_orientation)
 add_subdirectory(micro_segment)
+add_subdirectory(micro_actions)

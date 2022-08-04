@@ -35,5 +35,12 @@ service rpc_IDL
    */
    bool set_rate(1:double rate);
 
+   /**
+   * Set the blur options: type of a blur (1), blur amount (1-31)
+   * @return true/false on success/failure.
+   */
    bool set_blur(1:i32 blurtype, 2:i32 bluri);
+
+   // options for the detector
+   bool set_area(1:i32 area);
 }

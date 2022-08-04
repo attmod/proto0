@@ -1,11 +1,21 @@
 # init.sh
 
+This is run inside a docker container
+
 Functions:
 - recompile icub-gazebo (make sure it is up-to-date)
 - set paths for robotology, static /usr/local
-- start yarpserver and yarpmanager with app/icub-gazebo.xml
+- start yarpserver
 
 Closing the terminator terminal window ends the session
+
+# go
+
+Running
+
+    ./go
+    
+will recompile system1, install it, and launch yarpmanager
 
 # system1
 

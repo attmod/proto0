@@ -73,11 +73,12 @@ class ProcessingModule : public RFModule, public rpc_IDL {
     double areaMin = 370.0;
     double areaMax = 10000.0; // 100000 (100k) was for 640x480, 10000 (10k) for 320x240
 
-    int blur = 0; // type of a blur
-    int blur_iter = 31; // max iterations (that's fully blurred)
+    int blur = 1; // type of a blur
+    int blur_iter = 11; // max iterations (31 is quite fully blurred)
 
     //SimpleBlobDetector detector;
     Ptr<SimpleBlobDetector> detector;
+    SimpleBlobDetector::Params params;
 
     bool attach(RpcServer& source) override {
         return this->yarp().attachAsServer(source);
@@ -131,6 +132,10 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         */
 
         SimpleBlobDetector::Params params;
+
+        params.filterByArea = true;
+        params.minArea = 3;
+
         detector = SimpleBlobDetector::create(params);
 
 
@@ -164,6 +169,13 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         return true;
     }
 
+    bool set_area(int32_t area) override {
+        params.filterByArea = true;
+        params.minArea = area;
+        restart_detector();
+        return true;
+    }
+
     string type2str(int type) {
         string r;
 
@@ -187,6 +199,11 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         return r;
     }
 
+    void restart_detector() {
+        // delete detector; // in theory Ptr in opencv is a smart-pointer, complains "double free or corruption (out)" on delete
+        detector = SimpleBlobDetector::create(params);
+    }
+
     cv::Mat processing(ImageOf<PixelRgb>* inputImage, Bottle* response) {
         // warning: ‘void* yarp::sig::Image::getIplImage()’ is deprecated: Use yarp::cv::toCvMat instead [-Wdeprecated-declarations]
         //cv::Mat inputMatrix = cv::cvarrToMat((IplImage*) inputImage->getIplImage());
@@ -202,6 +219,12 @@ class ProcessingModule : public RFModule, public rpc_IDL {
             for ( int i = 1; i < blur_iter; i = i + 2 )
             {
                 cv::blur( inputMatrix, img, Size( i, i ), Point(-1,-1) );
+                int threshold_value = 3;
+                int threshold_type = 0;
+                int const max_binary_value = 255;
+                cv::cvtColor( img, img, cv::COLOR_RGB2GRAY );
+                cv::threshold( img, img, threshold_value, max_binary_value, threshold_type );
+                cv::cvtColor( img, img, cv::COLOR_GRAY2RGB );
             }
         }
 
