@@ -1,0 +1,60 @@
+<application>
+    <name>02 iCub system1-solid</name>
+
+<!-- system1-solid -->
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "system1-solid console" -e "system1-solid"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/icubSim/cam/left/depthImage:o</port>
+            <port timeout="20">/icubSim/cam/left/rgbImage:o</port>
+            </dependencies>
+    </module>
+
+    <connection>
+        <from>/icubSim/cam/left/rgbImage:o</from>
+        <to>/experiment/rgb:in</to>
+        <protocol>tcp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+    
+    <connection>
+        <from>/icubSim/cam/left/depthImage:o</from>
+        <to>/experiment/depth:in</to>
+        <protocol>tcp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+
+<!-- gazebo teleporter -->
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "gazebo teleporter: bekkering" -e "yarp write /write/bekkering /bekkering/model-mover/delta-pose:i"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/bekkering/model-mover/delta-pose:i</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "gazebo teleporter: cup_blue" -e "yarp write /write/cup_blue /cup_blue/model-mover/delta-pose:i"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/cup_blue/model-mover/delta-pose:i</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>xterm</name>
+        <parameters>-bg black -fg white -T "gazebo teleporter: mustard_bottle" -e "yarp write /write/mustard_bottle /mustard_bottle/model-mover/delta-pose:i"</parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="20">/mustard_bottle/model-mover/delta-pose:i</port>
+        </dependencies>
+    </module>
+
+
+</application>

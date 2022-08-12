@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd /workdir/system1
+mkdir -p build && cd build
+cmake ../
+make
+make install
+
+
+
+
+
+cd /workdir
+yarpmanager
+
