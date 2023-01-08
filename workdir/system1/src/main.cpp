@@ -33,7 +33,6 @@
 #include <yarp/sig/PointCloud.h>
 #include <yarp/math/Math.h>
 
-
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
@@ -995,6 +994,7 @@ class MainModule : public RFModule {
                 
                 
                 time_step(t0, "finishes everything");
+                
                 ShowManyImages( "images", 4, original, blurred, colored, edged); // blocking call!
 
             }
