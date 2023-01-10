@@ -62,6 +62,22 @@ class GrasperModule : public RFModule, public rpc_IDL {
     Bottle sqParams;
 
     Vector reach_x{0.0,0.0,0.0};
+    
+    Vector action_point{0.0,0.0,0.0};
+    bool action_point_valid=false;
+    double action_orientation=0;
+    bool action_orientation_valid=false;
+    Vector action_size{0.0,0.0,0.0};
+    bool action_size_valid=false;
+
+    BufferedPort<Bottle> pointPort;
+    BufferedPort<Bottle> orientationPort;
+    BufferedPort<Bottle> sizePort;
+
+    BufferedPort<Bottle> graspActionPort;
+    BufferedPort<Bottle> reachActionPort;
+    BufferedPort<Bottle> pointActionPort;
+
 
     bool attach(RpcServer& source) override {
         return this->yarp().attachAsServer(source);
@@ -81,7 +97,7 @@ class GrasperModule : public RFModule, public rpc_IDL {
 
     /**************************************************************************/
     bool configure(ResourceFinder& rf) override {
-        const string name = "icub-grasp";
+        const string name = "micro_grasp";
 
         Property arm_r_options;
         arm_r_options.put("device", "cartesiancontrollerclient");
@@ -164,11 +180,23 @@ class GrasperModule : public RFModule, public rpc_IDL {
         requestedSuperquadric.open("/"+name+"/msg:i");
         attach(rpcPort);
 
+
+        pointPort.open("/"+name+"/action/point:in");
+        orientationPort.open("/"+name+"/action/orientation:in");
+        sizePort.open("/"+name+"/action/size:in");
+        graspActionPort.open("/"+name+"/action/graspAction:in");
+        reachActionPort.open("/"+name+"/action/reachAction:in");
+        pointActionPort.open("/"+name+"/action/pointAction:in");
+
+
         yInfo() << "default sqParams in";
+        // object in front, slightly off-center
         sqParams.addFloat64(-0.435105);
         sqParams.addFloat64(-0.0838161);
         sqParams.addFloat64(-0.0573888);
+        // example angle
         sqParams.addFloat64(166.035);
+        // small size, tall
         sqParams.addFloat64(0.0313233);
         sqParams.addFloat64(0.0220981);
         sqParams.addFloat64(0.0783015);
@@ -223,8 +251,137 @@ class GrasperModule : public RFModule, public rpc_IDL {
             return true;
     }
 
-    /**************************************************************************/
     bool grasp() override {
+
+        const Vector sqCenter{sqParams.get(0).asFloat64(),
+                              sqParams.get(1).asFloat64(),
+                              sqParams.get(2).asFloat64()};
+
+        // set up the hand pre-grasp configuration
+        IControlLimits* ilim;
+        hand_r.view(ilim);
+        double pinkie_min, pinkie_max;
+        ilim->getLimits(15, &pinkie_min, &pinkie_max);
+        const vector<double> pregrasp_fingers_posture{60., 80., 0., 0., 0., 0., 0., 0., pinkie_max};
+
+        // keep gazing at the object
+        IGazeControl* igaze;
+        gaze.view(igaze);
+        igaze->setTrackingMode(true);
+        igaze->lookAtFixationPoint(sqCenter);
+
+        // apply cardinal points grasp algorithm
+        ICartesianControl* iarm;
+        arm_r.view(iarm);
+        auto grasper_r = make_shared<CardinalPointsGrasp>(CardinalPointsGrasp("right", pregrasp_fingers_posture));
+        const auto candidates_r = grasper_r->getCandidates(sqParams, iarm);
+
+        arm_l.view(iarm);
+        auto grasper_l = make_shared<CardinalPointsGrasp>(CardinalPointsGrasp("left", pregrasp_fingers_posture));
+        const auto candidates_l = grasper_l->getCandidates(sqParams, iarm);
+
+        // aggregate right and left arms candidates
+        auto candidates = candidates_r.first;
+        candidates.insert(candidates.end(), candidates_l.first.begin(), candidates_l.first.end());
+        std::sort(candidates.begin(), candidates.end(), CardinalPointsGrasp::compareCandidates);
+
+        // some safety checks
+        if (candidates.empty()) {
+            yError() << "No good grasp candidates found!";
+            //lookAtDeveloper();
+            //shrug();
+            return false;
+        }
+
+        // extract relevant info
+        const auto& best = candidates[0];
+        const auto& type = get<0>(best);
+        const auto& T = get<2>(best);
+
+//        viewer->showCandidates(candidates);
+
+        // select arm corresponing to the best candidate
+        shared_ptr<CardinalPointsGrasp> grasper;
+        IPositionControl* ihand;
+        int context;
+        if (type == "right") {
+             grasper = grasper_r;
+             hand_r.view(ihand);
+             arm_r.view(iarm);
+             context = candidates_r.second;
+        } else {
+             grasper = grasper_l;
+             hand_l.view(ihand);
+             arm_l.view(iarm);
+             context = candidates_l.second;
+        }
+
+        // target pose that allows grasping the object
+        const auto x = T.getCol(3).subVector(0, 2);
+        const auto o = dcm2axis(T);
+
+        // enable the context used by the algorithm
+        iarm->stopControl();
+        iarm->restoreContext(context);
+        iarm->setInTargetTol(.001);
+        iarm->setTrajTime(1.);
+
+        yInfo() << "put the hand in the pre-grasp configuration";
+
+        // put the hand in the pre-grasp configuration
+        // ihand->setRefAccelerations(fingers.size(), fingers.data(), vector<double>(fingers.size(), numeric_limits<double>::infinity()).data());
+        // ihand->setRefSpeeds(fingers.size(), fingers.data(), vector<double>{60., 60., 60., 60., 60., 60., 60., 60., 200.}.data());
+        // ihand->positionMove(fingers.size(), fingers.data(), pregrasp_fingers_posture.data());
+        // auto done = false;
+        // while (!done) {
+        //     Time::delay(1.);
+        //     ihand->checkMotionDone(fingers.size(), fingers.data(), &done);
+        // };
+
+        //yInfo() << "reach for the pre-grasp pose....";
+
+        // reach for the pre-grasp pose
+        //const auto dir = x - sqCenter;
+        //iarm->goToPoseSync(x + .05 * dir / norm(dir), o);
+        //iarm->waitMotionDone(.1, 3.);
+        
+        yInfo() << "reach for the object";
+
+        // reach for the object
+        iarm->goToPoseSync(x, o);
+        //iarm->waitMotionDone(.1, 3.);
+
+
+        ihand->setRefAccelerations(fingers.size(), fingers.data(), vector<double>(fingers.size(), numeric_limits<double>::infinity()).data());
+        ihand->setRefSpeeds(fingers.size(), fingers.data(), vector<double>{60., 60., 60., 60., 60., 60., 60., 60., 200.}.data());
+        ihand->positionMove(fingers.size(), fingers.data(), pregrasp_fingers_posture.data());
+        auto done = false;
+        while (!done) {
+            Time::delay(1.);
+            ihand->checkMotionDone(fingers.size(), fingers.data(), &done);
+        };
+
+
+
+        yInfo() << "close fingers";
+
+        // close fingers
+        ihand->positionMove(fingers.size(), fingers.data(), vector<double>{60., 80., 40., 35., 40., 35., 40., 35., pinkie_max}.data());
+
+
+        arm_r.view(iarm);
+        iarm->setTrackingMode(false);
+        arm_l.view(iarm);
+        iarm->setTrackingMode(false);
+        igaze->setTrackingMode(false);
+
+
+        return true;
+
+    }
+
+    /**************************************************************************/
+    bool grasp_full() {
 
         
         const Vector sqCenter{sqParams.get(0).asFloat64(),

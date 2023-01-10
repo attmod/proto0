@@ -12,6 +12,10 @@
 #include <random>
 #include <fstream>
 
+#include <chrono>
+#include <iostream>
+#include <time.h>
+
 #include <yarp/os/Network.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/ResourceFinder.h>
@@ -35,6 +39,10 @@
 
 #include "rpc_IDL.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types_c.h>
@@ -42,27 +50,47 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc/imgproc.hpp> 
 
+#include <yarp/cv/Cv.h>
+
+using namespace cv;
+
 using namespace std;
 using namespace yarp::os;
 using namespace yarp::dev;
 using namespace yarp::sig;
 using namespace yarp::math;
 
+using namespace std::chrono;
+
+
 /******************************************************************************/
 class ProcessingModule : public RFModule, public rpc_IDL {
     RpcServer rpcPort;
     //RpcClient sqPort;
     
-    BufferedPort<ImageOf<PixelRgb>> requestPort; // if incoming is normal image
-    //BufferedPort<ImageOf<PixelFloat>> requestPort; // if incoming is depth
-    BufferedPort<ImageOf<PixelRgb>> responsePort; // if incoming is normal image
-    //BufferedPort<Bottle> responsePort; // if request is vector/float64
+    BufferedPort<Bottle> requestPort;
+    BufferedPort<Bottle> responsePort;
 
-    BufferedPort<Bottle> fpsPort;
-    double requestedPeriod = 0.010;
-    int rate_count = 0;
-    int rate_fps = 0;
-    double rate_last = 0;
+    double requestedPeriod = 1.000;
+
+    std::ofstream csvfile;
+    std::string filename;
+
+    class CsvPort : public BufferedPort<Bottle>
+    {
+        public:
+            ProcessingModule *m;
+
+        private:
+            using BufferedPort<Bottle>::onRead;
+            void onRead(Bottle& b) override
+            {
+                m->csvwrite(b.get(0).asString());
+            }
+    };
+
+    CsvPort csvPort;
+
 
     bool attach(RpcServer& source) override {
         return this->yarp().attachAsServer(source);
@@ -70,16 +98,39 @@ class ProcessingModule : public RFModule, public rpc_IDL {
 
     /**************************************************************************/
     bool configure(ResourceFinder& rf) override {
-        // const string name = rf.check("name", 
-        //                    Value("/imageProcessing"), 
-        //                    "module name (string)").asString();
-        const string name = "image-to-image";
+        const string default_name = "csv_logger";
+        const string name = rf.check("name", 
+                           Value(default_name), 
+                           "module name (string)").asString();
 
-        requestPort.open("/"+name+"/in");
+        //requestPort.open("/"+name+"/in");
         responsePort.open("/"+name+"/out");
-        fpsPort.open("/"+name+"/fps:o");
         rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
+
+        csvPort.m = this;
+        csvPort.useCallback();
+        csvPort.open("/"+name+"/in");
+
+        //auto localtime = zoned_time{current_zone(), system_clock::now()};
+        // auto time = std::time(nullptr);
+        // std::string localtime;
+        // localtime << std::put_time(std::localtime(&time), "%F %T%z");
+
+        time_t rawtime;
+        struct tm * timeinfo;
+
+        time ( &rawtime );
+        timeinfo = localtime ( &rawtime );
+        //std::string localtime = asctime(timeinfo);
+
+        char localtime[30];
+        strftime(localtime, 30, "%Y%m%d-%H%M%S", timeinfo);
+        
+
+        //std::cout << localtime << '\n'; // preview
+        filename = "example_"+std::string(localtime)+".csv";
+        csvfile.open(filename);
 
         return true;
     }
@@ -105,88 +156,29 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         return true;
     }
 
-    double get_rate() override {
-        return (double)rate_fps;
+
+    void csvwrite(std::string s) {
+        csvfile << s << "\n";
+        yInfo() << s;
+        Bottle& logstring = responsePort.prepare();
+        logstring.clear();
+        logstring.addString(s);
+        responsePort.write();
+
     }
+
 
     /**************************************************************************/
-
-    void update_rate() {
-        rate_count++;
-        if( rate_last == 0 ) {
-            rate_last = Time::now();
-        }
-
-        if( rate_count > 100 ) {
-            double now = Time::now();
-            rate_fps = round( rate_count / ( now - rate_last )); 
-            rate_last = now;
-            rate_count = 0;
-        }
-
-        if( rate_count % 10 == 0 ) {
-            Bottle& fps_msg = fpsPort.prepare();
-            fps_msg.clear();
-            fps_msg.addInt64(rate_fps);
-            fpsPort.write();
-        }
-    }
-
     double getPeriod() override {
         return requestedPeriod;
     }
 
     /**************************************************************************/
     bool updateModule() override {
-        // don't wait, just snatch if available
-        // if( auto* msg0 = requestPort.read(false) ) {
-        //     yInfo() << "message incoming";
-        // }
-
-        // typical vector response
-        // Bottle& responseFix = responsePort.prepare(); // get an empty bottle for BufferedPort
-        // responseFix.clear();
-        // responseFix.addList().read(x);
-
-        // typical float response
-        // responseFix.addFloat64(x);
+        csvfile.close();
+        csvfile.open(filename,std::ios_base::app);
 
 
-        /* ---- MAKING AN IMAGE RESPONSE -----
-
-        ImageOf<PixelRgb> *response = &responsePort.prepare();
-
-        // since copy to the response with images returns SegFault - we do this the old-style way
-
-        // this is the response
-        cv::Mat responsecopy = ...
-
-        response->resize( 320, 240 );
-        int outputWidth = response->width();
-        int outputHeight = response->height();
-
-        unsigned char* pOutx = response->getRawImage();
-        int outPaddingx = response->getPadding();
-        IplImage tempIplx = cvIplImage(responsecopy);
-        char* pMatrixx     = tempIplx.imageData;
-        int matrixPaddingx = tempIplx.widthStep - tempIplx.width * 3;
-        for (int r = 0; r < outputHeight; r++) {
-            for(int c = 0 ; c < outputWidth; c++) {             
-                *pOutx++ = *pMatrixx++;
-                *pOutx++ = *pMatrixx++;
-                *pOutx++ = *pMatrixx++;
-            }
-            pOutx     += outPaddingx;
-            pMatrixx  += matrixPaddingx;
-        }
-
-        responsePort.write();
-
-        */
-
-
-
-        update_rate();
         return true;
     }
 
@@ -194,8 +186,6 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         // interrupt blocking read
         requestPort.interrupt();
         responsePort.interrupt();
-        rpcPort.interrupt();
-        fpsPort.interrupt();
         return true;
     }
 
@@ -204,7 +194,9 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         rpcPort.close();
         requestPort.close();
         responsePort.close();
-        fpsPort.close();
+
+        csvfile.close();
+
         return true;
     }
 };

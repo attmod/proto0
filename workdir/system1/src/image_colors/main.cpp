@@ -82,7 +82,7 @@ class ProcessingModule : public RFModule, public rpc_IDL {
     cv::Scalar purpleHigh = cv::Scalar(152, 255, 255);
     cv::Scalar redLow = cv::Scalar(170, 140, 160);
     cv::Scalar redHigh = cv::Scalar(180, 255, 255);
-    cv::Scalar orangeLow = cv::Scalar(15, 200, 80);
+    cv::Scalar orangeLow = cv::Scalar(2, 200, 200);
     cv::Scalar orangeHigh = cv::Scalar(20, 255, 255);
 
     cv::Scalar low;

@@ -1,0 +1,33 @@
+<application>
+    <name>05 Scenario 2 connections - orientation after colors</name>
+
+<!-- colors -->
+
+    <connection>
+        <from>/icubSim/cam/left/rgbImage:o</from>
+        <to>/image_colors/in</to>
+        <protocol>udp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+
+<!-- blob -->
+
+    <connection>
+        <from>/image_colors/out</from>
+        <to>/image_blob/in</to>
+        <protocol>tcp</protocol>
+        <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+    </connection>
+
+
+<!--  micro_orientation -->
+
+<connection>
+    <from>/image_blob/blur</from>
+    <to>/micro_orientation/in</to>
+    <protocol>udp</protocol>
+    <geometry>(Pos ((x -1) (y -1)) ((x 86) (y -48)) ((x -79) (y 16))  )</geometry>
+</connection>
+
+
+</application>

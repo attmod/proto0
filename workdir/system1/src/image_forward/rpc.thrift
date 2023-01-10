@@ -35,9 +35,5 @@ service rpc_IDL
    */
    bool set_rate(1:double rate);
 
-   /**
-   * Set the update rate
-   * @return true/false on success/failure.
-   */
-   double get_rate();
+
 }

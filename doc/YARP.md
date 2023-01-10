@@ -226,14 +226,32 @@ p.open("/in");
 ```
 
 
-# yarpmanager
+# yarp image copy
 
-Additional useful entries for yarpmanager are in yarpmanager.xml file.
+Since .copy() function is somewhat broken, this is a copy image-cv::Mat-image
 
-# Loose advice
+```cpp
+    void imageCopyRgb( ImageOf<PixelRgb>* org, ImageOf<PixelRgb>* target ) {
+        cv::Mat org2 = yarp::cv::toCvMat(*org);
 
-Best way to work with modules that come with _random_ pieces of documentation:
-- compile them using standard mkdir build && cd build && cmake ../ && make
-- don't install yet
-- check share directory for modules files and templates
+        int outputWidth = org->width();
+        int outputHeight = org->height();
+        target->resize( outputWidth, outputHeight );
 
+        unsigned char* pOutx = target->getRawImage();
+        int outPaddingx = target->getPadding();
+        IplImage tempIplx = cvIplImage(org2);
+        //IplImage tempIplx = org->getIplImage();
+        char* pMatrixx     = tempIplx.imageData;
+        int matrixPaddingx = tempIplx.widthStep - tempIplx.width * 3;
+        for (int r = 0; r < outputHeight; r++) {
+            for(int c = 0 ; c < outputWidth; c++) {             
+                *pOutx++ = *pMatrixx++;
+                *pOutx++ = *pMatrixx++;
+                *pOutx++ = *pMatrixx++;
+            }
+            pOutx     += outPaddingx;
+            pMatrixx  += matrixPaddingx;
+        }
+    }
+```

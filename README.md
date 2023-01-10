@@ -1,11 +1,26 @@
 # Architecture Prototype Zero
 
-Overview
+Created in August 2022 as a framework for developing modules for iCub with the aim of deploying perception processing and action planning in a multimodal way.
+
+Illustration of starting the solid branch (commit 3904de2):
+
+[![Video](https://img.youtube.com/vi/b1NM2gSi9II/default.jpg)](https://www.youtube.com/watch?v=b1NM2gSi9II)
+
+Initial overview - planning
 - Pure gazebo, yarp, C++ modules
 - No additional tools both optional and required for building outside of docker and docker-compose
 - No experiment, no decision system or higher level logic, no message broker
 - No grasping, just inverse kinematics and moving the hand to the proximity of the object - orientation of the hand as the parameter, but simple open/close
 - Simple convolutional filters for edge detection, disparity maps
+
+What was done?
+- basic perception: colors, edges, 3d objects
+- grasping using superquadrics, reaching
+
+Conclusions:
+- acceptable framework, but splitting into several docker containers would be better for the future
+- add python modules for faster prototyping
+
 
 # Running
 
@@ -17,7 +32,7 @@ Closing the terminator terminal window closes everything.
 
 Currently nvidia gpu support is included in docker-compose file, turn off when on intel/amd machine. Required by some modules (stereo-vision).
 
-system1 is can be build and launched by executing
+system1 can be build and launched by executing
 
     ./go
 
@@ -35,6 +50,8 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
 
 # Checklist
 
+## Initial
+
 - [x] create github repository
   - https://github.com/attmod/proto0
 - [x] creating a "one click solution" for building/running the environment
@@ -42,30 +59,41 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - classic docker-compose (nvidia gpu by default)
   - Consider dockyman for running later, if still using X.org forwarding
   - code inside - single cmake/make combo for all
-- [ ] developing the perception module (c++ separate file)
+
+## Perception
+
+- [x] developing the perception module (c++ separate file)
   - [x] template: image-to-image, image-to-point, image-to-gloat
-  - [ ] yarp: logpolar
-    - BROKEN, returns an error for array size and crashes when connecting camera image with yarp connect
   - [x] opencv: template for convolution filter
   - [x] opencv: edge detect
     - imageProcessingEdge: sobel and canny, on 320x240 (SegFault on 640x480)
   - [x] opencv: image threshold
   - [x] opencv: contour detect
   - [x] opencv: orientation detect
-  - [ ] yarp: orientation detect (find-superquadric)
+  - [x] yarp: orientation detect (find-superquadric)
   - [x] opencv: blob detection, with blur for merging loose points (other method?)
-    - [ ] add threshold after blur
+    - [x] add threshold after blur
   - [x] yarp: stereo-vision
     - provides SFM and disparity
   - [x] yarp: attmod/segmentation
     - [x] add attmod/segmentation to a Dockerfile
   - [x] vtk: segmentation
     - with table:o for table height and /out pointcloud of detected shape/shapes
+
+# Perception - step two
+
+- [ ] additional perception after August meeting
+  - [ ] yarp: logpolar
+    - BROKEN, returns an error for array size and crashes when connecting camera image with yarp connect
+- [ ] micro_segment modifications
     - [ ] blob for fetching central point from 3d cloud?
       - PCL centroid https://pointclouds.org/documentation/classpcl_1_1_centroid_point.html
   - [ ] yarp: caffe
     - requires: apt-get install -y nvidia-cuda-toolkit
     - BROKEN: cmake returns get_target_property() called with non-existent target "caffe".
+
+# Actions
+
 - [x] developing action module (c++ separate file)
   - [x] micro_grasp
   - [x] action selection
@@ -82,13 +110,11 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - [x] grasping: micro_grasp: cardinal points for generation of grasps
     - supports both reach and grasp
     - [ ] move fully to nonsync
+
+# Validation and cost functions
+
 - [ ] defining target functions that validate the actions. They return TRUE once the action is successful
   - this is a second stage, for point/reach/grasp level, not action
-- [x] defining a set of visual features needed for achieving the actions. Input to the action modules
-  - Bekkering: color, orientation, position
-    - [x] color support
-    - [x] orientation support
-    - [ ] position support
 - [x] defining a rate for each perception/action module
   - (current VGA camera setup tops out at 640x480 with 15fps on the real robot)
   - try to include graphs with delays introduced at each stage (Gannt-style)
@@ -102,6 +128,14 @@ which will cmake/make/install the system1 project and launch `yarpmanager`.
   - [x] .xml and .sh files to auto load everything
   - [ ] teleport objects of interest into the robot's viewport
 - [ ] (optional) statistics of cost functions respect to the different actions
+
+# Experiment 1: Bekkering
+
+- [x] defining a set of visual features needed for achieving the actions. Input to the action modules
+  - Bekkering: color, orientation, position
+    - [x] color support
+    - [x] orientation support
+    - [ ] position support
 
 
 # Spliced repositories

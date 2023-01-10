@@ -56,6 +56,11 @@ using namespace yarp::dev;
 using namespace yarp::sig;
 using namespace yarp::math;
 
+
+#include <chrono>
+using namespace chrono;
+
+
 /******************************************************************************/
 class ProcessingModule : public RFModule, public rpc_IDL {
     const string default_name = "image_blob";
@@ -142,16 +147,43 @@ class ProcessingModule : public RFModule, public rpc_IDL {
         return true;
     }
 
+    uint64_t millis()
+    {
+        uint64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch())
+                .count();
+        return ms; 
+    }
+
+    uint64_t micros()
+    {
+        uint64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch())
+                .count();
+        return us; 
+    }
+
+    bool flag_running = false;
+    uint64_t timestamp_start;
+    uint64_t timestamp_stop;
+
+    // converstion is:
+    // long long dur = duration_cast<microseconds>(t2 - t1).count();
+
     bool start() override {
-        return false;
+        flag_running = true;
+        timestamp_start = micros();
+        return true;
     }
 
     bool stop() override {
-        return false;
+        flag_running = false;
+        timestamp_stop = micros();
+        return true;
     }
 
     bool running() override {
-        return false;
+        return flag_running;
     }
 
     bool set_rate(double rate) override {
@@ -254,64 +286,68 @@ class ProcessingModule : public RFModule, public rpc_IDL {
 
     /**************************************************************************/
     bool updateModule() override {
-        // don't wait, just snatch if available
-        if( ImageOf<PixelRgb>* msg0 = requestPort.read(false) ) {
-            //yInfo() << "message incoming";
-            
-            Bottle& responseCoords = responsePort.prepare();
-            responseCoords.clear();
+        if( flag_running ) {
+            // don't wait, just snatch if available
+            if( ImageOf<PixelRgb>* msg0 = requestPort.read(false) ) {
+                //yInfo() << "message incoming";
+                
+                Bottle& responseCoords = responsePort.prepare();
+                responseCoords.clear();
 
-            yInfo() << "process";
+                yInfo() << "process";
 
-            //ImageOf<PixelRgb> responsecopy = processing(msg0);
-            
-            // img - cv blurred image
-            // response - yarp blurred image  -> blurPort
-            // responseCoords - bottle of bottles with x,y coords   -> responsePort
+                //ImageOf<PixelRgb> responsecopy = processing(msg0);
+                
+                // img - cv blurred image
+                // response - yarp blurred image  -> blurPort
+                // responseCoords - bottle of bottles with x,y coords   -> responsePort
 
-            ImageOf<PixelRgb>& response = blurPort.prepare();
-            cv::Mat responsecopy = processing(msg0, &responseCoords);
-            
-            //ImageOf<PixelRgb> responsecopy = yarp::cv::fromCvMat<yarp::sig::PixelRgb>( img );
+                ImageOf<PixelRgb>& response = blurPort.prepare();
+                cv::Mat responsecopy = processing(msg0, &responseCoords);
+                
+                //ImageOf<PixelRgb> responsecopy = yarp::cv::fromCvMat<yarp::sig::PixelRgb>( img );
 
-            yInfo() << "resize";
+                yInfo() << "resize";
 
-            response.resize( 320, 240 );
-            int outputWidth = response.width();
-            int outputHeight = response.height();
+                response.resize( 320, 240 );
+                int outputWidth = response.width();
+                int outputHeight = response.height();
 
 
-            yInfo() << "copy";
+                yInfo() << "copy";
 
-            unsigned char* pOutx = response.getRawImage();
-            int outPaddingx = response.getPadding();
-            IplImage tempIplx = cvIplImage(responsecopy);
-            char* pMatrixx     = tempIplx.imageData;
-            int matrixPaddingx = tempIplx.widthStep - tempIplx.width * 3;
-            for (int r = 0; r < outputHeight; r++) {
-                for(int c = 0 ; c < outputWidth; c++) {             
-                    *pOutx++ = *pMatrixx++;
-                    *pOutx++ = *pMatrixx++;
-                    *pOutx++ = *pMatrixx++;
+                unsigned char* pOutx = response.getRawImage();
+                int outPaddingx = response.getPadding();
+                IplImage tempIplx = cvIplImage(responsecopy);
+                char* pMatrixx     = tempIplx.imageData;
+                int matrixPaddingx = tempIplx.widthStep - tempIplx.width * 3;
+                for (int r = 0; r < outputHeight; r++) {
+                    for(int c = 0 ; c < outputWidth; c++) {             
+                        *pOutx++ = *pMatrixx++;
+                        *pOutx++ = *pMatrixx++;
+                        *pOutx++ = *pMatrixx++;
+                    }
+                    pOutx     += outPaddingx;
+                    pMatrixx  += matrixPaddingx;
                 }
-                pOutx     += outPaddingx;
-                pMatrixx  += matrixPaddingx;
+
+
+
+                //yInfo() << response.width() << response.height() ;
+
+                //response->copy( responsecopy );
+                //response.addFloat64(  );
+
+                yInfo() << "write";
+
+                responsePort.write();
+                blurPort.write();
             }
 
-
-
-            //yInfo() << response.width() << response.height() ;
-
-            //response->copy( responsecopy );
-            //response.addFloat64(  );
-
-            yInfo() << "write";
-
-            responsePort.write();
-            blurPort.write();
+            return true;
+        } else {
+            //return false;
         }
-
-        return true;
     }
 
     bool interruptModule() override {

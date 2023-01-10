@@ -12,32 +12,20 @@
 service rpc_IDL
 {
    /**
-   * Start parsing
+   * Go home with arms and gaze.
    * @return true/false on success/failure.
    */
-   bool start();
+   bool home();
 
    /**
-   * Stop parsing
+   * Grasp the object.
    * @return true/false on success/failure.
    */
-   bool stop();
+   bool grasp();
 
    /**
-   * Return the status of parsing process
-   * @return true/false on running/stopped
-   */
-   bool running();
-
-   /**
-   * Set the update rate
+   * Go the whole hog.
    * @return true/false on success/failure.
    */
-   bool set_rate(1:double rate);
-
-   /**
-   * Set the update rate
-   * @return true/false on success/failure.
-   */
-   double get_rate();
+   bool go();
 }

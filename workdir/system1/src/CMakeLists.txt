@@ -32,4 +32,9 @@ add_subdirectory(micro_orientation)
 add_subdirectory(micro_segment)
 add_subdirectory(micro_actions)
 
+
 add_subdirectory(gazebo_teleporter)
+add_subdirectory(csv_logger)
+add_subdirectory(image_forward)
+
+add_subdirectory(micro_robot_reset)
