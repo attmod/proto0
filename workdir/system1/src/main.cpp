@@ -53,6 +53,7 @@
 #include <pcl/common/centroid.h>
 
 #include "cardinal_points_grasp.h"
+#include "rpc_IDL.h"
 
 using namespace std;
 using namespace yarp::os;
@@ -928,12 +929,19 @@ class ProcessingAction {
 
 
 /******************************************************************************/
-class MainModule : public RFModule {
+class MainModule : public RFModule, public rpc_IDL {
 
     BufferedPort<ImageOf<PixelRgb>> cameraPort; 
     BufferedPort<ImageOf<PixelFloat>> depthPort; 
 
+    BufferedPort<ImageOf<PixelRgb>> colorPort;
+    BufferedPort<ImageOf<PixelRgb>> colorBlurPort;
+    BufferedPort<ImageOf<PixelRgb>> edgePort;
+    BufferedPort<Bottle> centroidPort;
+
     ProcessingAction processing;
+
+    RpcServer rpcPort;
 
 
     bool configure(ResourceFinder& rf) override {
@@ -947,9 +955,25 @@ class MainModule : public RFModule {
 
         processing.look_fixation( -0.4, 0, -0.3 );
 
+        colorPort.open("/"+name+"/color:img:out");
+        colorBlurPort.open("/"+name+"/colorblur:img:out");
+        edgePort.open("/"+name+"/edge:img:out");
+        centroidPort.open("/"+name+"/centroid:out");
+
+        rpcPort.open("/"+name+"/rpc");
+        attach(rpcPort);
 
         return true;
     }
+
+    double getPeriod() override {
+        return 0.050;
+    }
+
+    bool attach(RpcServer& source) override {
+        return this->yarp().attachAsServer(source);
+    }
+
 
     // yarp::os::Time uses actually a good perfomance clock, at least in C++ on linux so far
     double time_start() {
@@ -961,6 +985,38 @@ class MainModule : public RFModule {
         double t1 = yarp::os::Time::now();
         yInfo() << comment << " at " << t1-t0;
         return t1;
+    }
+
+    void imageWrite( cv::Mat source, ImageOf<PixelRgb> *response )
+    {
+            response->resize( 320, 240 );
+            int outputWidth = response->width();
+            int outputHeight = response->height();
+
+            unsigned char* pOutx = response->getRawImage();
+            int outPaddingx = response->getPadding();
+            IplImage tempIplx = cvIplImage(source);
+            char* pMatrixx     = tempIplx.imageData;
+            int matrixPaddingx = tempIplx.widthStep - tempIplx.width * 3;
+            for (int r = 0; r < outputHeight; r++) {
+                for(int c = 0 ; c < outputWidth; c++) {             
+                    *pOutx++ = *pMatrixx++;
+                    *pOutx++ = *pMatrixx++;
+                    *pOutx++ = *pMatrixx++;
+                }
+                pOutx     += outPaddingx;
+                pMatrixx  += matrixPaddingx;
+            }
+    }
+
+    bool grasp(double x, double y, double z, double angle, double gx, double gy, double gz) override {
+        processing.grasp( x,y,z, angle, gx,gy,gz );
+        return true;
+    }
+
+    bool go() override {
+        processing.grasp();
+        return true;
     }
 
     /**************************************************************************/
@@ -995,8 +1051,16 @@ class MainModule : public RFModule {
                 
                 time_step(t0, "finishes everything");
                 
-                ShowManyImages( "images", 4, original, blurred, colored, edged); // blocking call!
+                //ShowManyImages( "images", 4, original, blurred, colored, edged); // blocking call!
 
+                imageWrite( colored, &colorPort.prepare() );
+                colorPort.write();
+
+                imageWrite( blurred, &colorBlurPort.prepare() );
+                colorBlurPort.write();
+
+                imageWrite( edged, &edgePort.prepare() );
+                edgePort.write();
             }
         }
         return true;
